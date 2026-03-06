@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@elevenlabs/client-sdk@latest/dist/index.min.js"></script>
     <style>
         body { background-color: #020617; color: #e2e8f0; overflow: hidden; }
         .glass-nav { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -18,8 +17,8 @@
             70% { box-shadow: 0 0 0 30px rgba(239, 68, 68, 0); }
             100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
-        #transcript-box::-webkit-scrollbar { width: 3px; }
-        #transcript-box::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        #conversation-history::-webkit-scrollbar { width: 3px; }
+        #conversation-history::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
 </head>
 <body class="h-screen flex flex-col">
@@ -28,52 +27,26 @@
             <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center"><i class="fas fa-robot text-white text-xs"></i></div>
             <h1 class="font-bold text-white italic tracking-tighter">IRE<span class="text-blue-500">NIA</span> PRO</h1>
         </div>
-        <div class="flex items-center gap-4">
-            <a href="https://irenia.app" target="_blank" class="text-[10px] font-bold text-slate-400 hover:text-white transition border border-slate-800 px-3 py-1 rounded-lg">
-                <i class="fas fa-external-link-alt mr-1"></i> IRENIA.APP
-            </a>
-            <button id="logout-btn" class="text-slate-500 hover:text-red-400 transition"><i class="fas fa-power-off"></i></button>
-        </div>
+        <button id="logout-btn" class="text-slate-500 hover:text-red-400 transition"><i class="fas fa-power-off"></i></button>
     </nav>
 
     <main class="chat-view flex flex-col items-center justify-between p-6">
-        <div id="transcript-box" class="w-full max-w-2xl flex-1 overflow-y-auto mb-6 px-4 space-y-4 text-center">
-            <p id="status-text" class="text-blue-500 font-bold text-[10px] uppercase tracking-[0.3em]">Motor Listo</p>
-            <div id="conversation-history" class="text-sm md:text-base space-y-4"></div>
+        <div id="conversation-history" class="w-full max-w-2xl flex-1 overflow-y-auto mb-6 px-4 space-y-4">
+            <p id="status-text" class="text-blue-500 font-bold text-[10px] uppercase tracking-[0.3em] text-center">Motor Listo</p>
         </div>
-        <div id="voice-trigger" class="w-28 h-28 bg-blue-600 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(37,99,235,0.3)] cursor-pointer hover:scale-105 transition-all active:scale-95">
+        <div id="voice-trigger" class="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center shadow-[0_0_40px_rgba(37,99,235,0.3)] cursor-pointer hover:scale-105 transition-all">
             <i class="fas fa-microphone text-white text-3xl"></i>
         </div>
     </main>
 
     <footer class="h-24 bg-slate-950/80 border-t border-white/5 p-4 flex justify-center items-center">
-        <div class="max-w-4xl w-full flex gap-3">
-            <input type="text" id="text-input" placeholder="Escribe tu consulta..." class="flex-1 bg-slate-900 border border-slate-800 rounded-2xl px-6 py-3 text-sm focus:border-blue-500 outline-none">
-            <button id="send-btn" class="bg-blue-600 h-12 w-12 rounded-2xl flex items-center justify-center shadow-lg"><i class="fas fa-paper-plane text-white"></i></button>
-            <button id="stop-btn" class="bg-slate-800 h-12 w-12 rounded-2xl hover:bg-red-600 flex items-center justify-center"><i class="fas fa-stop text-white text-xs"></i></button>
-        </div>
+        <form id="chat-form" class="max-w-4xl w-full flex gap-3">
+            <input type="text" id="text-input" placeholder="Escribe tu consulta..." class="flex-1 bg-slate-900 border border-slate-800 rounded-2xl px-6 py-3 text-sm focus:border-blue-500 outline-none text-white">
+            <button type="submit" class="bg-blue-600 h-12 w-12 rounded-2xl flex items-center justify-center shadow-lg"><i class="fas fa-paper-plane text-white"></i></button>
+        </form>
     </footer>
 
-    <script>
-    // 1. Configuración de conexión
-    const SUPABASE_URL = 'https://ttymwhkhwwgljuguxeia.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'; 
-    const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-    // 2. Lógica de Logout simplificada
-    document.getElementById('logout-btn').addEventListener('click', async () => {
-        try {
-            await _supabase.auth.signOut();
-            // Usamos replace para limpiar el historial y evitar que el botón "atrás" rompa la app
-            window.location.replace("login.html");
-        } catch (err) {
-            window.location.href = "login.html";
-        }
-    });
-    </script>
- 
     <script src="auth.js"></script>
     <script src="chat.js"></script>
-
-    </body>
+</body>
 </html>
