@@ -44,6 +44,9 @@ let sessionConversationId = null;
 let micMuted = true;
 let userTypedCache = '';
 let userTypedAt = 0;
+let voiceToggleInFlight = false;
+let voiceInteractionLocked = false;
+let wasSpeaking = false;
 
 function uid() {
     return `${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
@@ -66,6 +69,17 @@ function setVoiceEnabled(enabled) {
     voiceBtn.classList.toggle('opacity-40', !enabled);
     voiceBtn.classList.toggle('cursor-not-allowed', !enabled);
     voiceBtn.classList.toggle('cursor-pointer', enabled);
+}
+
+function refreshVoiceButtonState() {
+    const enabled = !settings.textOnly && !voiceInteractionLocked && !voiceToggleInFlight;
+    setVoiceEnabled(enabled);
+    voiceBtn.disabled = !enabled;
+}
+
+function setVoiceInteractionLocked(locked) {
+    voiceInteractionLocked = Boolean(locked);
+    refreshVoiceButtonState();
 }
 
 function saveState() {
@@ -335,7 +349,12 @@ function buildContextSummary(messages) {
 }
 
 async function endCurrentSession() {
-    if (!conversationSession || !conversationSession.isOpen()) return;
+    if (!conversationSession || !conversationSession.isOpen()) {
+        micMuted = true;
+        wasSpeaking = false;
+        setVoiceInteractionLocked(false);
+        return;
+    }
 
     try {
         await conversationSession.endSession();
@@ -346,13 +365,26 @@ async function endCurrentSession() {
     conversationSession = null;
     sessionConversationId = null;
     micMuted = true;
+    wasSpeaking = false;
+    setVoiceInteractionLocked(false);
 }
 
 function onModeChange(mode) {
     if (mode === 'speaking') {
+        wasSpeaking = true;
+        setVoiceInteractionLocked(true);
         setStatus('Hablando...');
         setOrbListening(false);
         return;
+    }
+
+    if (mode === 'listening' && wasSpeaking) {
+        wasSpeaking = false;
+        if (conversationSession && conversationSession.isOpen() && !settings.textOnly && !micMuted) {
+            micMuted = true;
+            conversationSession.setMicMuted(true);
+        }
+        setVoiceInteractionLocked(false);
     }
 
     if (settings.textOnly) {
@@ -417,10 +449,14 @@ async function ensureSession() {
         },
         onDisconnect: () => {
             micMuted = true;
+            wasSpeaking = false;
+            setVoiceInteractionLocked(false);
             setStatus('Motor listo');
             setOrbListening(false);
         },
         onError: (message) => {
+            wasSpeaking = false;
+            setVoiceInteractionLocked(false);
             setStatus('Error de conexion');
             console.error('ElevenLabs error:', message);
         },
@@ -476,7 +512,13 @@ async function selectConversation(id) {
 function syncSettingsUI() {
     settingTextOnly.checked = Boolean(settings.textOnly);
     settingAutoListen.checked = Boolean(settings.autoListen);
-    setVoiceEnabled(!settings.textOnly);
+
+    if (settings.textOnly) {
+        wasSpeaking = false;
+        setVoiceInteractionLocked(false);
+    }
+
+    refreshVoiceButtonState();
 
     if (settings.textOnly) {
         setStatus('Modo texto activo');
@@ -626,24 +668,47 @@ textInput.addEventListener('input', () => {
 });
 
 voiceBtn.addEventListener('click', async () => {
-    if (settings.textOnly) return;
+    if (settings.textOnly || voiceInteractionLocked || voiceToggleInFlight) return;
+
+    voiceToggleInFlight = true;
+    refreshVoiceButtonState();
 
     try {
         const session = await ensureSession();
         if (!session) return;
 
-        micMuted = !micMuted;
-        session.setMicMuted(micMuted);
+        // One tap = one audio turn. Ignore extra taps until the turn completes.
+        if (!micMuted) return;
+
+        micMuted = false;
+        session.setMicMuted(false);
+        setVoiceInteractionLocked(true);
         onModeChange('listening');
     } catch (error) {
         console.error(error);
+        setVoiceInteractionLocked(false);
         setStatus('Permiso de microfono requerido');
         setOrbListening(false);
+    } finally {
+        voiceToggleInFlight = false;
+        refreshVoiceButtonState();
     }
 });
 
 endConversationBtn.addEventListener('click', async () => {
+    const hadOpenSession = Boolean(conversationSession && conversationSession.isOpen());
+
     await endCurrentSession();
+
+    micMuted = true;
+    voiceToggleInFlight = false;
+    setVoiceInteractionLocked(false);
+    refreshVoiceButtonState();
+
+    if (hadOpenSession) {
+        appendMessage('assistant', 'Conversacion finalizada. Cuando quieras, presiona el microfono para iniciar otra.', true);
+    }
+
     setStatus(settings.textOnly ? 'Modo texto activo' : 'Conversacion finalizada');
     setOrbListening(false);
 });

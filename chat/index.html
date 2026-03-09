@@ -15,10 +15,16 @@
         .settings-panel { background: linear-gradient(180deg, rgba(15,23,42,0.98) 0%, rgba(2,6,23,0.96) 100%); border-left: 1px solid rgba(255,255,255,0.06); }
         .orb-listening { animation: pulse-red 1.5s infinite; background: #ef4444 !important; }
         .conversation-item-active { background: rgba(59,130,246,0.18); border: 1px solid rgba(59,130,246,0.35); }
+        #conversation-history { scrollbar-width: thin; scrollbar-color: #2563eb #0b1732; }
+        #conversation-history::-webkit-scrollbar { width: 15px; }
+        #conversation-history::-webkit-scrollbar-track { background: #0b1732; }
+        #conversation-history::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #3b82f6, #1d4ed8); border-radius: 999px; border: 2px solid #0b1732; }
+        #conversation-history::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #60a5fa, #2563eb); }
         @media (min-width: 768px) {
             .sidebar-panel { width: 18rem; transition: width .2s ease; }
             .sidebar-panel.desktop-collapsed { width: 0; border-right-color: transparent; overflow: hidden; }
             .sidebar-panel.desktop-collapsed > * { opacity: 0; pointer-events: none; }
+            .sidebar-panel.desktop-collapsed + div #chat-form { max-width: 48rem; }
         }
         @media (max-width: 767px) {
             #desktop-sidebar-toggle { display: none; }
@@ -31,7 +37,7 @@
 </head>
 <body class="h-dvh overflow-hidden flex">
     <aside id="sidebar" class="sidebar-panel w-72 max-w-[85vw] absolute md:relative inset-y-0 left-0 z-40 transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-out flex flex-col">
-        <div class="p-4 border-b border-white/10 space-y-3">
+        <div class="p-4 md:pt-16 border-b border-white/10 space-y-3">
             <div class="flex items-center justify-between mb-3">
                 <h2 class="text-slate-100 font-semibold text-sm">Conversaciones</h2>
                 <button id="mobile-sidebar-close" class="text-slate-300 hover:text-white transition"><i class="fas fa-times"></i></button>
@@ -47,14 +53,15 @@
         <div id="conversation-list" class="flex-1 overflow-y-auto p-3 space-y-2"></div>
     </aside>
 
-    <div class="flex-1 min-w-0 flex flex-col">
-        <nav class="glass-nav shrink-0 h-14 sm:h-16 px-4 sm:px-6 flex justify-between items-center z-50">
-            <div class="flex items-center gap-3">
-                <button id="desktop-sidebar-toggle" class="text-slate-300 hover:text-white transition"><i class="fas fa-bars"></i></button>
+    <div class="flex-1 min-w-0 flex flex-col relative">
+        <button id="desktop-sidebar-toggle" class="absolute left-4 sm:left-6 md:left-7 top-0 h-14 sm:h-16 flex items-center text-slate-300 hover:text-white transition z-[60]"><i class="fas fa-bars"></i></button>
+
+        <nav class="glass-nav shrink-0 h-14 sm:h-16 px-4 sm:px-6 md:px-7 flex justify-between items-center z-50">
+            <div class="flex items-center gap-3 pl-8 sm:pl-10 md:pl-11">
                 <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center"><i class="fas fa-robot text-white text-xs"></i></div>
-                <h1 class="font-bold text-white italic tracking-tighter">IRE<span class="text-blue-500">NIA</span> PRO</h1>
+                <h1 class="font-bold text-white italic tracking-tighter">IRE<span class="text-blue-500">NIA</span></h1>
             </div>
-            <div class="flex items-center gap-4">
+            <div class="flex items-center gap-4 ml-4">
                 <button id="settings-toggle" class="text-slate-400 hover:text-white transition"><i class="fas fa-sliders-h"></i></button>
                 <button id="logout-btn" class="text-slate-500 hover:text-red-400 transition"><i class="fas fa-power-off"></i></button>
             </div>
@@ -63,12 +70,12 @@
         <main class="chat-view flex-1 min-h-0 relative flex">
             <div id="sidebar-backdrop" class="hidden absolute inset-0 bg-black/60 z-30"></div>
 
-            <section id="chat-section" class="flex-1 min-w-0 flex flex-col">
+            <section id="chat-section" class="flex-1 min-w-0 min-h-0 flex flex-col">
                 <div class="shrink-0 pt-4 sm:pt-5 pb-3 sm:pb-4 px-3 sm:px-5 md:px-6">
                     <p id="status-text" class="text-blue-500 font-bold text-[10px] uppercase tracking-[0.3em] text-center">Motor Listo</p>
                 </div>
                 <div id="conversation-history" class="flex-1 overflow-y-auto px-3 sm:px-5 md:px-6 pb-3 sm:pb-5 md:pb-6">
-                    <div id="conversation-track" class="w-full max-w-3xl mx-auto flex flex-col space-y-3 sm:space-y-4"></div>
+                    <div id="conversation-track" class="w-full max-w-2xl mx-auto flex flex-col space-y-3 sm:space-y-4"></div>
                 </div>
             </section>
 
@@ -103,8 +110,8 @@
         </aside>
     </main>
 
-        <footer class="shrink-0 bg-slate-950/90 backdrop-blur-sm border-t border-white/5 p-3 sm:p-4 pb-[calc(0.75rem+env(safe-area-inset-bottom))] z-50">
-            <div class="w-full max-w-3xl mx-auto flex flex-col items-center gap-3">
+        <footer class="shrink-0 bg-slate-950/90 backdrop-blur-sm border-t border-white/5 px-4 sm:px-6 md:px-7 py-3 sm:py-4 pb-[calc(1.1rem+env(safe-area-inset-bottom))] z-50">
+            <div class="w-full flex flex-col items-center gap-3 pb-2 sm:pb-3">
                 <button id="end-conversation-btn" class="text-xs sm:text-sm px-4 py-2 rounded-xl border border-slate-600 text-slate-300 hover:text-white hover:border-slate-400 transition">
                     <i class="fas fa-stop-circle mr-2"></i>Terminar conversacion
                 </button>
@@ -115,6 +122,7 @@
                     <input type="text" id="text-input" placeholder="Escribe tu consulta..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-3 text-sm sm:text-base text-white outline-none focus:border-blue-500">
                     <button type="submit" class="bg-blue-600 h-11 w-11 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0"><i class="fas fa-paper-plane text-white"></i></button>
                 </form>
+                <p class="text-[11px] sm:text-xs text-slate-500 text-center">Irenia by HumanHub | Asistente conversacional</p>
             </div>
         </footer>
     </div>
