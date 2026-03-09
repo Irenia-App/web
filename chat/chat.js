@@ -380,9 +380,12 @@ function onModeChange(mode) {
 
     if (mode === 'listening' && wasSpeaking) {
         wasSpeaking = false;
-        if (conversationSession && conversationSession.isOpen() && !settings.textOnly && !micMuted) {
-            micMuted = true;
-            conversationSession.setMicMuted(true);
+        if (conversationSession && conversationSession.isOpen()) {
+            try {
+                conversationSession.interrupt();
+            } catch (error) {
+                console.log('Interrupcion no disponible:', error);
+            }
         }
         setVoiceInteractionLocked(false);
     }
