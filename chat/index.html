@@ -8,15 +8,15 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background-color: #020617; color: #e2e8f0; overflow: hidden; }
+        body { background-color: #020617; color: #e2e8f0; }
         .glass-nav { background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05); }
-        .chat-view { height: calc(100vh - 160px); background: radial-gradient(circle at center, #0f172a 0%, #020617 100%); }
+        .chat-view { background: radial-gradient(circle at center, #0f172a 0%, #020617 100%); }
         .orb-listening { animation: pulse-red 1.5s infinite; background: #ef4444 !important; }
         @keyframes pulse-red { 0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); } 70% { box-shadow: 0 0 0 30px rgba(239, 68, 68, 0); } 100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); } }
     </style>
 </head>
-<body class="h-screen flex flex-col">
-    <nav class="glass-nav h-16 px-6 flex justify-between items-center z-50">
+<body class="min-h-dvh flex flex-col">
+    <nav class="glass-nav h-14 sm:h-16 px-4 sm:px-6 flex justify-between items-center z-50">
         <div class="flex items-center gap-3">
             <div class="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center"><i class="fas fa-robot text-white text-xs"></i></div>
             <h1 class="font-bold text-white italic tracking-tighter">IRE<span class="text-blue-500">NIA</span> PRO</h1>
@@ -24,23 +24,24 @@
         <button id="logout-btn" class="text-slate-500 hover:text-red-400 transition"><i class="fas fa-power-off"></i></button>
     </nav>
 
-    <main class="chat-view flex flex-col items-center justify-between p-6">
-        <div id="conversation-history" class="w-full max-w-2xl flex-1 overflow-y-auto mb-6 px-4 space-y-4 flex flex-col">
+    <main class="chat-view flex-1 min-h-0 flex flex-col items-center justify-between p-3 sm:p-5 md:p-6">
+        <div id="conversation-history" class="w-full max-w-2xl flex-1 min-h-0 overflow-y-auto mb-4 sm:mb-6 px-1 sm:px-4 space-y-3 sm:space-y-4 flex flex-col">
             <p id="status-text" class="text-blue-500 font-bold text-[10px] uppercase tracking-[0.3em] text-center">Motor Listo</p>
         </div>
-        <div id="voice-trigger" class="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center shadow-lg cursor-pointer transition-all">
-            <i class="fas fa-microphone text-white text-3xl"></i>
+        <div id="voice-trigger" class="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-blue-600 rounded-full flex items-center justify-center shadow-lg cursor-pointer transition-all">
+            <i class="fas fa-microphone text-white text-xl sm:text-2xl md:text-3xl"></i>
         </div>
     </main>
 
-    <footer class="h-24 bg-slate-950/80 border-t border-white/5 p-4 flex justify-center items-center">
-        <form id="chat-form" class="max-w-4xl w-full flex gap-3">
-            <input type="text" id="text-input" placeholder="Escribe tu consulta..." class="flex-1 bg-slate-900 border border-slate-800 rounded-2xl px-6 py-3 text-white outline-none focus:border-blue-500">
-            <button type="submit" class="bg-blue-600 h-12 w-12 rounded-2xl flex items-center justify-center"><i class="fas fa-paper-plane text-white"></i></button>
+    <footer class="bg-slate-950/80 border-t border-white/5 p-3 sm:p-4 flex justify-center items-center pb-[calc(0.75rem+env(safe-area-inset-bottom))]">
+        <form id="chat-form" class="max-w-4xl w-full flex gap-2 sm:gap-3">
+            <input type="text" id="text-input" placeholder="Escribe tu consulta..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl px-4 sm:px-6 py-3 text-sm sm:text-base text-white outline-none focus:border-blue-500">
+            <button type="submit" class="bg-blue-600 h-11 w-11 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0"><i class="fas fa-paper-plane text-white"></i></button>
         </form>
     </footer>
 
     <script src="auth.js"></script>
+    <script src="https://unpkg.com/@11labs/client@0.2.0/dist/lib.umd.js"></script>
     <script src="chat.js"></script>
 </body>
 </html>
